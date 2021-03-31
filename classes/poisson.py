@@ -24,7 +24,13 @@ class Poisson:
             self.params = rates
 
         # Observation of the poisson random variable, should be a length n column vector where n is the number of observations
-        self.data = data.reshape((len(data), 1))
+        self.data = data.reshape((len(data), 1)).astype(float)
+        # Beware of 0 in the data, as if all zeros are clustered together, the algorithm will break
+        # Define a value that's almost zero to compensate
+        if not np.all(self.data):
+            zero_replace = 1e-20
+            zeros_idx = np.where(self.data == 0)[0]
+            self.data[zeros_idx] = zero_replace
 
         # Compute likelihood and log likelihood
         self.update()

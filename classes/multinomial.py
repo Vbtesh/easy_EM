@@ -44,7 +44,6 @@ class Multinomial:
 
     def get_log_likelihood(self, obs):
         # obs must be an integer or a column vector
-        # obs must be an integer or a column vector
         if isinstance(obs, np.ndarray):
             return np.log(self.params[obs.flatten().astype(int), :])
         else:

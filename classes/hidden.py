@@ -18,6 +18,9 @@ class Hidden:
             params = np.random.uniform(size=self.c)
             self.params_init = params / params.sum()
             self.params = params / params.sum()
+        elif len(init_dist) == num_clusters:
+            self.params_init = init_dist
+            self.params = init_dist
 
         self.log_params = np.log(self.params)
 
@@ -33,10 +36,13 @@ class Hidden:
 
         # Do the max log transformation
         # Subtract the maximum log from each row
-        log_q_h = log_q_h - np.amax(log_q_h, axis=0)
+        max_array = np.amax(log_q_h, axis=1).reshape((obs_log_likelihoods[0].shape[0], 1))
+        log_q_h = log_q_h - np.tile(max_array, (1, self.c))
         # Exponentiate and normalise resulting variational distribution
         q_h = np.exp(log_q_h)
         self.q_h = normArray(q_h)
+
+        # Compute likelihood and log likelhood
         pass
 
 
@@ -49,3 +55,19 @@ class Hidden:
         self.log_params = np.log(self.params)
 
         self.n_iter += 1
+
+    
+    def get_likelihood(self, obs):
+        # obs must be an integer or a column vector
+        if isinstance(obs, np.ndarray):
+            return self.params[obs.flatten().astype(int), :]
+        else:
+            return self.params[obs, :]
+
+
+    def get_log_likelihood(self, obs):
+        # obs must be an integer or a column vector
+        if isinstance(obs, np.ndarray):
+            return np.log(self.params[obs.flatten().astype(int), :])
+        else:
+            return np.log(self.params[obs, :])
